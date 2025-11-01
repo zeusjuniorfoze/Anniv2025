@@ -1,0 +1,277 @@
+﻿<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Anniv Hub - Junior</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Site d'anniversaire interactif pour Junior">
+  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet" />
+  <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
+  <link rel="stylesheet" href="./css/style.css" />
+</head>
+
+<body>
+  <div class="bg-decor" id="bg-decor" aria-hidden="true"></div>
+
+  <!-- === OVERLAYS ET MODALS === -->
+  <!-- Gift Overlay -->
+  <div class="gift-overlay" id="gift-overlay" role="dialog" aria-modal="true">
+    <div class="gift-card animate__animated animate__bounceIn">
+      <div class="gift-title">Ouvre ton cadeau</div>
+      <div class="gift-box" id="gift-box" data-aos="zoom-in">
+        <div class="lid"></div>
+        <div class="box"></div>
+        <div class="ribbon-vert"></div>
+        <div class="ribbon-horiz"></div>
+      </div>
+      <button class="open-gift-btn animate__animated animate__heartBeat animate__infinite" id="open-gift-btn"
+        aria-label="Ouvrir le cadeau">Toucher pour ouvrir</button>
+    </div>
+    <div class="confetti" id="confetti"></div>
+  </div>
+  <!-- Modal Partage -->
+  <div class="modal-overlay" id="share-modal" hidden>
+    <div class="modal-card">
+      <div class="modal-header">
+        <h4>Partager l'événement</h4>
+        <button class="close-btn" id="close-share-modal" title="Retour">
+          <i class="bx bx-left-arrow-alt"></i>
+        </button>
+      </div>
+      <div class="share-options">
+        <button class="share-option" data-platform="whatsapp">
+          <i class='bx bxl-whatsapp'></i>
+          <span>WhatsApp</span>
+        </button>
+        <button class="share-option" data-platform="facebook">
+          <i class='bx bxl-facebook'></i>
+          <span>Facebook</span>
+        </button>
+        <button class="share-option" data-platform="twitter">
+          <i class='bx bxl-twitter'></i>
+          <span>Twitter</span>
+        </button>
+        <button class="share-option" id="copy-link">
+          <i class='bx bx-link'></i>
+          <span>Copier le lien</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Input fichier caché pour upload -->
+  <input type="file" id="photo-upload" accept="image/*" hidden>
+
+  <!-- === VUES PRINCIPALES === -->
+  <!-- Lobby / Hub (Page d'accueil) -->
+  <div class="hub" id="view-lobby">
+    <div class="hub-header">
+      <h2 class="animate__animated animate__fadeInDown" data-aos="fade-down">Bienvenue pour fêter l'anniversaire de
+        <span id="hub-celebrant">Junior</span>
+      </h2>
+      <p class="animate__animated animate__fadeInUp" data-aos="fade-up" data-aos-delay="120">Choisis un module pour
+        t'amuser !</p>
+
+      <!-- Compte à rebours -->
+      <div class="countdown-banner" id="countdown-banner" data-aos="fade-up" data-aos-delay="240">
+        <div class="countdown-title">Prochain anniversaire dans :</div>
+        <div class="countdown-timer" id="countdown-timer">
+          <span class="countdown-item"><span id="countdown-days">0</span> jours</span>
+          <span class="countdown-item"><span id="countdown-hours">0</span> heures</span>
+          <span class="countdown-item"><span id="countdown-minutes">0</span> minutes</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="hub-grid">
+      <button class="hub-card" data-view="quiz"><i class='bx bx-message-dots'></i><span>Est-ce que tu me connais
+          vraiment ? Quiz Junior</span></button>
+      <button class="hub-card" data-view="wishes"><i class='bx bx-heart'></i><span>Laisse moi un vœu</span></button>
+      <button class="hub-card" data-view="memory"><i class='bx bx-grid-alt'></i><span>Joue avec moi Memory
+          4x4</span></button>
+      <button class="hub-card" data-view="polls"><i class='bx bx-poll'></i><span>Sondage</span></button>
+      <button class="hub-card" data-view="gallery"><i class='bx bx-photo-album'></i><span>Galerie Photo</span></button>
+      <button class="hub-card" id="share-btn"><i class='bx bx-share-alt'></i><span> Invite Plus Partager</span></button>
+    </div>
+  </div>
+
+  <!-- Quiz Interactif -->
+  <div class="view" id="view-quiz" hidden>
+    <div class="view-header">
+      <button class="icon-btn" id="back-to-lobby-quiz"><i class='bx bx-left-arrow-alt'></i></button>
+      <h3>Quiz sur Junior</h3>
+      </button>
+    </div>
+
+    <!-- Mode Admin -->
+    <div class="quiz-admin-panel" id="quiz-admin-panel" hidden>
+      <h4>Administration du Quiz</h4>
+      <form id="quiz-question-form" class="quiz-question-form">
+        <input type="text" id="quiz-question-input" placeholder="Nouvelle question..." required>
+        <div class="quiz-options">
+          <input type="text" class="quiz-option-input" placeholder="Option 1" required>
+          <input type="text" class="quiz-option-input" placeholder="Option 2" required>
+          <input type="text" class="quiz-option-input" placeholder="Option 3" required>
+          <input type="text" class="quiz-option-input" placeholder="Option 4" required>
+        </div>
+        <select id="quiz-correct-answer" required>
+          <option value="">Choisir la bonne réponse</option>
+          <option value="0">Option 1</option>
+          <option value="1">Option 2</option>
+          <option value="2">Option 3</option>
+          <option value="3">Option 4</option>
+        </select>
+        <button type="submit" class="send-btn">Ajouter la question</button>
+      </form>
+      <div class="quiz-questions-list" id="quiz-questions-list">
+        <!-- Liste des questions existantes -->
+      </div>
+    </div>
+
+    <!-- Mode Joueur -->
+    <div class="quiz-player-panel" id="quiz-player-panel">
+      <!-- Question Actuelle -->
+      <div class="quiz-current" id="quiz-current">
+        <div class="quiz-question-card" id="quiz-question-card">
+          <div class="quiz-progress">
+            Question <span id="quiz-current-number">1</span>/<span id="quiz-total-questions">0</span>
+          </div>
+          <h4 id="quiz-current-question">Chargement...</h4>
+          <div class="quiz-options-grid" id="quiz-options-grid">
+            <!-- Les options seront ajoutées dynamiquement -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Résultats -->
+      <div class="quiz-results" id="quiz-results" hidden>
+        <div class="quiz-score-card">
+          <h4>Résultats du Quiz</h4>
+          <div class="quiz-score">
+            <span id="quiz-score-value">0</span>/<span id="quiz-total-answered">0</span>
+          </div>
+          <p id="quiz-result-message"></p>
+          <button class="send-btn" id="quiz-restart-btn">Recommencer</button>
+        </div>
+      </div>
+
+      <!-- Historique des Questions -->
+      <div class="quiz-history" id="quiz-history">
+        <h5>Questions Répondues</h5>
+        <div class="questions-history-list" id="questions-history-list">
+          <!-- L'historique sera rempli dynamiquement -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chat Bot (Ancien Quiz) -->
+  <div class="chat-wrapper" id="view-chat" hidden>
+    <div class="chat-container animate__animated animate__fadeInUp" data-aos="zoom-in">
+      <div class="garland" aria-hidden="true"></div>
+      <div class="float-layer" aria-hidden="true" id="float-layer"></div>
+      <div class="balloon b1"></div>
+      <div class="balloon b2"></div>
+
+      <div class="chat-header" data-aos="fade-down">
+        <div class="avatar">
+          <i class='bx bxs-cake'></i>
+        </div>
+        <div class="info">
+          <p class="title">Bot Anniv' de Junior</p>
+          <p class="subtitle" id="status">en ligne · prêt à fêter</p>
+        </div>
+        <div class="header-actions">
+          <button class="icon-btn" title="Retour" id="back-to-lobby-chat"><i class='bx bx-home'></i></button>
+        </div>
+      </div>
+
+      <div class="hero-banner" data-aos="fade-up" data-aos-delay="150">
+        <span class="tag"><i class='bx bxs-party'></i> Happy Birthday</span>
+        <h2>Anniversaire interactif</h2>
+        <p>Écris ton prénom et vois si tu connais bien Junior !</p>
+      </div>
+
+      <div class="messages" id="messages"></div>
+
+      <form class="input-area" id="chat-form">
+        <button type="button" class="icon-btn-sm" id="emoji-btn"><i class='bx bx-happy'></i></button>
+        <input type="text" id="user-input" placeholder="Écris ton prénom, ta réponse ou 'aide'..." autocomplete="off" />
+        <button type="submit" class="send-btn"><i class='bx bx-send'></i></button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Mur de Vœux -->
+  <div class="view" id="view-wishes" hidden>
+    <div class="view-header">
+      <button class="icon-btn" id="back-to-lobby-1"><i class='bx bx-left-arrow-alt'></i></button>
+      <h3>Mur de Vœux : Laisse un vœu pour Junior</h3>
+    </div>
+    <form id="wish-form" class="wish-form">
+      <input type="text" id="wish-name" placeholder="Ton prénom" required>
+      <div class="wish-message-wrap">
+        <textarea id="wish-message" placeholder="Ton message pour Junior (jusqu'à 1000 caractères)" rows="3"
+          required></textarea>
+        <div class="wish-counter"><span id="wish-counter">0</span>/1000</div>
+      </div>
+      <button type="submit" class="send-btn">Envoyer</button>
+    </form>
+    <div id="wishes-list" class="wishes-list"></div>
+  </div>
+  <style>
+
+  </style>
+
+  <!-- Memory Game -->
+  <div class="view" id="view-memory" hidden>
+    <div class="view-header">
+      <button class="icon-btn" id="back-to-lobby-2"><i class='bx bx-left-arrow-alt'></i></button>
+      <h3>Memory 4x4 : Trouve les paires en un temps record</h3>
+    </div>
+    <div id="memory-grid" class="memory-grid"></div>
+    <div class="memory-footer">
+      <span>Temps: <strong id="mem-time">0.0s</strong></span>
+      <span style="margin-left:12px">Meilleur Temps est : <strong id="mem-best">--</strong></span>
+      <button class="icon-btn" id="mem-restart"><i class='bx bx-refresh'></i></button>
+    </div>
+  </div>
+
+  <!-- Sondages -->
+  <div class="view" id="view-polls" hidden>
+    <div class="view-header">
+      <button class="icon-btn" id="back-to-lobby-3"><i class='bx bx-left-arrow-alt'></i></button>
+      <h3>Sondage</h3>
+    </div>
+    <div id="poll-block" class="poll-block"></div>
+  </div>
+
+  <!-- Galerie Photo -->
+  <div class="view" id="view-gallery" hidden>
+    <div class="view-header">
+      <button class="icon-btn" id="back-to-lobby-4"><i class='bx bx-left-arrow-alt'></i></button>
+      <h3>Galerie Photo</h3>
+      <button class="icon-btn" id="upload-trigger" title="Ajouter une photo">
+        <i class='bx bx-cloud-upload'></i>
+      </button>
+    </div>
+
+    <div class="gallery-grid" id="gallery-grid">
+      <!-- Les photos seront chargées dynamiquement -->
+    </div>
+
+    <div class="upload-area" id="upload-area">
+      <i class='bx bx-cloud-upload'></i>
+      <p>Glisse une photo ici ou clique pour uploader</p>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+  <script src="./js/main.js"></script>
+</body>
+
+</html>
