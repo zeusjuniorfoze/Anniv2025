@@ -885,6 +885,29 @@ body {
   position: relative;
 }
 
+/* Bouton "Lire plus" en mode texte, non carré */
+.read-more {
+  width: auto;
+  height: auto;
+  padding: 6px 10px;
+  margin-top: 6px;
+  border-radius: 10px;
+  background: rgba(255, 91, 138, 0.12);
+  border: 1px solid rgba(255, 91, 138, 0.24);
+  color: #ff5b8a;
+  font-size: 12px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.read-more:hover {
+  background: rgba(255, 91, 138, 0.18);
+  transform: none;
+}
+
 /* Indicateur de texte tronqué */
 .wish-item .meta.truncated::after {
   content: "...";

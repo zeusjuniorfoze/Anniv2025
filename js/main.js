@@ -67,9 +67,9 @@ function spawnConfetti(n = 80) {
     "#ff9fb8",
     "#ffc7a6",
   ];
-  
-  confettiEl.innerHTML = '';
-  
+
+  confettiEl.innerHTML = "";
+
   for (let i = 0; i < n; i++) {
     const piece = document.createElement("div");
     piece.className = "confetti-piece";
@@ -107,7 +107,7 @@ function playPopBurst() {
     const data = buffer.getChannelData(0);
     for (let i = 0; i < buffer.length; i++)
       data[i] = (Math.random() * 2 - 1) * (1 - i / buffer.length);
-    
+
     const noise = ctx.createBufferSource();
     noise.buffer = buffer;
     const bp = ctx.createBiquadFilter();
@@ -143,15 +143,33 @@ function playHappyBirthday() {
   try {
     const ctx = getCtx();
     const seq = [
-      [392, 0.35], [392, 0.15], [440, 0.5], [392, 0.5],
-      [523.25, 0.5], [493.88, 0.8], [392, 0.35], [392, 0.15],
-      [440, 0.5], [392, 0.5], [587.33, 0.5], [523.25, 0.8],
-      [392, 0.35], [392, 0.15], [784, 0.5], [659.25, 0.5],
-      [523.25, 0.5], [493.88, 0.5], [440, 0.8], [698.46, 0.35],
-      [698.46, 0.15], [659.25, 0.5], [523.25, 0.5], [587.33, 0.5],
-      [523.25, 0.9]
+      [392, 0.35],
+      [392, 0.15],
+      [440, 0.5],
+      [392, 0.5],
+      [523.25, 0.5],
+      [493.88, 0.8],
+      [392, 0.35],
+      [392, 0.15],
+      [440, 0.5],
+      [392, 0.5],
+      [587.33, 0.5],
+      [523.25, 0.8],
+      [392, 0.35],
+      [392, 0.15],
+      [784, 0.5],
+      [659.25, 0.5],
+      [523.25, 0.5],
+      [493.88, 0.5],
+      [440, 0.8],
+      [698.46, 0.35],
+      [698.46, 0.15],
+      [659.25, 0.5],
+      [523.25, 0.5],
+      [587.33, 0.5],
+      [523.25, 0.9],
     ];
-    
+
     let t = ctx.currentTime + 0.1;
     seq.forEach(([freq, dur]) => {
       const osc = ctx.createOscillator();
@@ -160,18 +178,18 @@ function playHappyBirthday() {
       osc.frequency.value = freq;
       g.gain.value = 0.0001;
       osc.connect(g).connect(ctx.destination);
-      
+
       const a = 0.01;
       const d = 0.06;
       const s = 0.15;
       const rel = 0.06;
-      
+
       g.gain.setValueAtTime(0.0001, t);
       g.gain.linearRampToValueAtTime(0.2, t + a);
       g.gain.linearRampToValueAtTime(s, t + a + d);
       g.gain.setValueAtTime(s, t + Math.max(0.05, dur - rel));
       g.gain.linearRampToValueAtTime(0.0001, t + dur);
-      
+
       osc.start(t);
       osc.stop(t + dur + 0.02);
       t += dur + 0.02;
@@ -192,13 +210,13 @@ function spawnBalloon() {
   const left = Math.random() * 92 + 2;
   const size = 26 + Math.random() * 18;
   const dur = 8 + Math.random() * 8;
-  
+
   b.style.left = left + "%";
   b.style.background = color;
   b.style.width = size + "px";
   b.style.height = size * 1.3 + "px";
   b.style.animationDuration = dur + "s";
-  
+
   floatLayer.appendChild(b);
   setTimeout(() => b.remove(), dur * 1000);
 }
@@ -210,10 +228,10 @@ function spawnFlyingGarland() {
   g.className = "flying-garland" + (Math.random() > 0.5 ? " rev" : "");
   const y = Math.random() > 0.5 ? -10 + Math.random() * 30 : undefined;
   if (y !== undefined) g.style.top = y + "px";
-  
+
   const dur = 18 + Math.random() * 16;
   g.style.animationDuration = dur + "s";
-  
+
   bgDecor.appendChild(g);
   setTimeout(() => g.remove(), dur * 1000);
 }
@@ -226,13 +244,13 @@ function spawnPompon() {
   const startX = Math.random() * 100;
   const size = 10 + Math.random() * 18;
   const dur = 10 + Math.random() * 10;
-  
+
   p.style.left = startX + "vw";
   p.style.bottom = "-24px";
   p.style.width = size + "px";
   p.style.height = size + "px";
   p.style.animationDuration = dur + "s, 2.6s";
-  
+
   bgDecor.appendChild(p);
   setTimeout(() => p.remove(), dur * 1000);
 }
@@ -257,16 +275,16 @@ function showView(name) {
     memory: memoryView,
     polls: pollsView,
     gallery: galleryView,
-    quiz: quizView
+    quiz: quizView,
   };
-  
+
   // Cacher toutes les vues
   Object.values(views).forEach((v) => v && (v.hidden = true));
-  
+
   // Afficher la vue demandée
   if (views[name]) {
     views[name].hidden = false;
-    
+
     // Initialisations spécifiques aux vues
     if (name === "gallery") {
       loadGallery();
@@ -288,122 +306,133 @@ document.querySelectorAll(".hub-card[data-view]").forEach((btn) => {
 
 // ===== RÉCUPÉRATION ET AFFICHAGE DU MEILLEUR SCORE =====
 async function loadBestMemoryScore() {
-    try {
-        const response = await fetch("https://anniv-backend-2025-1.onrender.com/games/memory/best");
-        
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        const data = await response.json();
-        
-        const bestScoreElement = document.getElementById("mem-best");
-        if (bestScoreElement && data.global_best_ms) {
-            const bestSeconds = data.global_best_ms / 1000;
-            bestScoreElement.textContent = `${bestSeconds.toFixed(1)}s`;
-        } else if (bestScoreElement) {
-            bestScoreElement.textContent = "--";
-        }
-    } catch (error) {
-        console.error("Erreur chargement meilleur score:", error);
-        const bestScoreElement = document.getElementById("mem-best");
-        if (bestScoreElement) {
-            bestScoreElement.textContent = "--";
-        }
+  try {
+    const response = await fetch(
+      "https://anniv-backend-2025-1.onrender.com/games/memory/best"
+    );
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
+
+    const data = await response.json();
+
+    const bestScoreElement = document.getElementById("mem-best");
+    if (bestScoreElement && data.global_best_ms) {
+      const bestSeconds = data.global_best_ms / 1000;
+      bestScoreElement.textContent = `${bestSeconds.toFixed(1)}s`;
+    } else if (bestScoreElement) {
+      bestScoreElement.textContent = "--";
+    }
+  } catch (error) {
+    console.error("Erreur chargement meilleur score:", error);
+    const bestScoreElement = document.getElementById("mem-best");
+    if (bestScoreElement) {
+      bestScoreElement.textContent = "--";
+    }
+  }
 }
 
 // Modifier la fonction setupMemory pour charger le meilleur score
 function setupMemory() {
-    const deck = shuffle([...memIcons, ...memIcons]);
-    memGrid.innerHTML = "";
-    memFirst = null;
-    memLock = false;
-    memMatches = 0;
-    memStart = 0;
-    if (memTimer) {
-        clearInterval(memTimer);
-        memTimer = null;
-    }
-    memTimeEl.textContent = "0.0s";
-    
-    // Charger le meilleur score
-    loadBestMemoryScore();
-    
-    deck.forEach((ico, idx) => {
-        const c = document.createElement("div");
-        c.className = "card";
-        c.dataset.icon = ico;
-        c.dataset.idx = idx;
-        c.textContent = "❓";
-        EventManager.on(c, "click", () => onCardClick(c));
-        memGrid.appendChild(c);
-    });
+  const deck = shuffle([...memIcons, ...memIcons]);
+  memGrid.innerHTML = "";
+  memFirst = null;
+  memLock = false;
+  memMatches = 0;
+  memStart = 0;
+  if (memTimer) {
+    clearInterval(memTimer);
+    memTimer = null;
+  }
+  memTimeEl.textContent = "0.0s";
+
+  // Charger le meilleur score
+  loadBestMemoryScore();
+
+  deck.forEach((ico, idx) => {
+    const c = document.createElement("div");
+    c.className = "card";
+    c.dataset.icon = ico;
+    c.dataset.idx = idx;
+    c.textContent = "❓";
+    EventManager.on(c, "click", () => onCardClick(c));
+    memGrid.appendChild(c);
+  });
 }
 
 // Modifier la fonction onCardClick pour mettre à jour le meilleur score si nécessaire
 function onCardClick(c) {
-    if (memLock || c.classList.contains("revealed") || c.classList.contains("matched")) {
-        return;
+  if (
+    memLock ||
+    c.classList.contains("revealed") ||
+    c.classList.contains("matched")
+  ) {
+    return;
+  }
+
+  if (!memStart) {
+    memStart = performance.now();
+    memTimer = setInterval(() => {
+      memTimeEl.textContent =
+        ((performance.now() - memStart) / 1000).toFixed(1) + "s";
+    }, 100);
+  }
+
+  c.classList.add("revealed");
+  c.textContent = c.dataset.icon;
+
+  if (!memFirst) {
+    memFirst = c;
+    return;
+  }
+
+  if (memFirst.dataset.icon === c.dataset.icon) {
+    memFirst.classList.add("matched");
+    c.classList.add("matched");
+    memMatches++;
+    memFirst = null;
+
+    if (memMatches === memIcons.length) {
+      clearInterval(memTimer);
+      const elapsed = Math.round(performance.now() - memStart);
+
+      try {
+        fetch("https://anniv-backend-2025-1.onrender.com/games/memory/best", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: currentName || "Invité",
+            best_time_ms: elapsed,
+          }),
+        }).then(() => {
+          // Recharger le meilleur score après avoir sauvegardé
+          loadBestMemoryScore();
+        });
+      } catch {}
+
+      spawnConfetti(120);
     }
-    
-    if (!memStart) {
-        memStart = performance.now();
-        memTimer = setInterval(() => {
-            memTimeEl.textContent = ((performance.now() - memStart) / 1000).toFixed(1) + "s";
-        }, 100);
-    }
-    
-    c.classList.add("revealed");
-    c.textContent = c.dataset.icon;
-    
-    if (!memFirst) {
-        memFirst = c;
-        return;
-    }
-    
-    if (memFirst.dataset.icon === c.dataset.icon) {
-        memFirst.classList.add("matched");
-        c.classList.add("matched");
-        memMatches++;
-        memFirst = null;
-        
-        if (memMatches === memIcons.length) {
-            clearInterval(memTimer);
-            const elapsed = Math.round(performance.now() - memStart);
-            
-            try {
-                fetch("https://anniv-backend-2025-1.onrender.com/games/memory/best", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        name: currentName || "Invité",
-                        best_time_ms: elapsed,
-                    }),
-                }).then(() => {
-                    // Recharger le meilleur score après avoir sauvegardé
-                    loadBestMemoryScore();
-                });
-            } catch {}
-            
-            spawnConfetti(120);
-        }
-    } else {
-        memLock = true;
-        setTimeout(() => {
-            memFirst.classList.remove("revealed");
-            memFirst.textContent = "❓";
-            c.classList.remove("revealed");
-            c.textContent = "❓";
-            memFirst = null;
-            memLock = false;
-        }, 700);
-    }
+  } else {
+    memLock = true;
+    setTimeout(() => {
+      memFirst.classList.remove("revealed");
+      memFirst.textContent = "❓";
+      c.classList.remove("revealed");
+      c.textContent = "❓";
+      memFirst = null;
+      memLock = false;
+    }, 700);
+  }
 }
 // Boutons retour
 const backButtons = [
-  "back-to-lobby-1", "back-to-lobby-2", "back-to-lobby-3", 
-  "back-to-lobby-4", "back-to-lobby-chat", "back-to-lobby-quiz"
+  "back-to-lobby-1",
+  "back-to-lobby-2",
+  "back-to-lobby-3",
+  "back-to-lobby-4",
+  "back-to-lobby-chat",
+  "back-to-lobby-quiz",
 ];
 
 backButtons.forEach((id) => {
@@ -421,17 +450,23 @@ function addMessage(text, from = "bot") {
   div.textContent = text;
   messagesEl.appendChild(div);
   messagesEl.scrollTop = messagesEl.scrollHeight;
-  
-  div.addEventListener("animationend", () => {
-    div.classList.remove("animate__animated", anim);
-  }, { once: true });
+
+  div.addEventListener(
+    "animationend",
+    () => {
+      div.classList.remove("animate__animated", anim);
+    },
+    { once: true }
+  );
 }
 
 // API URL
 const apiUrl = "https://anniv-backend-2025-1.onrender.com/message";
 
 // Message d'accueil
-addMessage("Joyeux anniversaire " + celebrant + " ! Tape 'aide' pour voir les commandes.");
+addMessage(
+  "Joyeux anniversaire " + celebrant + " ! Tape 'aide' pour voir les commandes."
+);
 
 // Soumission du formulaire de chat
 EventManager.on(form, "submit", async (e) => {
@@ -455,17 +490,17 @@ EventManager.on(form, "submit", async (e) => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ text, name: currentName, celebrant }),
     });
-    
+
     const data = await res.json();
     (data.replies || []).forEach((r) => addMessage(r, "bot"));
-    
+
     if (data.filter_image) {
       const img = document.createElement("img");
       img.src = data.filter_image;
       img.className = "filter-img";
       messagesEl.appendChild(img);
     }
-    
+
     messagesEl.scrollTop = messagesEl.scrollHeight;
     statusEl.textContent = "en ligne";
   } catch (err) {
@@ -475,18 +510,49 @@ EventManager.on(form, "submit", async (e) => {
 });
 
 // ===== MODULE CADEAU =====
+// ===== MODULE CADEAU =====
 function openGift() {
   if (!overlay || !giftBox) return;
-  
+
   giftBox.classList.add("open");
   spawnConfetti(140);
-  
-  try { playPopBurst(); } catch {}
-  
+
+  try {
+    playPopBurst();
+  } catch {}
+
+  // Essayez de lire le morceau personnalisé si présent; sinon, fallback sur l'air synthétique
   setTimeout(() => {
-    try { playHappyBirthday(); } catch {}
-  }, 350);
-  
+    const audio = document.getElementById("gift-song");
+    if (audio && typeof audio.play === "function") {
+      try {
+        audio.currentTime = 0;
+        audio.volume = 1.0;
+
+        // Ajouter un événement pour relancer la musique quand elle se termine
+        const handleSongEnd = () => {
+          audio.currentTime = 0;
+          audio.play().catch(() => {});
+        };
+
+        audio.addEventListener("ended", handleSongEnd);
+        audio.play().catch(() => {
+          try {
+            playHappyBirthday();
+          } catch {}
+        });
+      } catch {
+        try {
+          playHappyBirthday();
+        } catch {}
+      }
+    } else {
+      try {
+        playHappyBirthday();
+      } catch {}
+    }
+  }, 300);
+
   setTimeout(() => {
     overlay.classList.add("hidden");
     setTimeout(() => {
@@ -577,8 +643,12 @@ function shareEvent(platform) {
 
   const shareUrls = {
     whatsapp: `https://wa.me/?text=${encodeURIComponent(text + " " + url)}`,
-    facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`,
-    twitter: `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`,
+    facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
+      url
+    )}`,
+    twitter: `https://twitter.com/intent/tweet?text=${encodeURIComponent(
+      text
+    )}&url=${encodeURIComponent(url)}`,
   };
 
   if (shareUrls[platform]) {
@@ -595,11 +665,11 @@ const wishCounterEl = document.getElementById("wish-counter");
 
 function updateWishCounter() {
   if (!wishMsgEl || !wishCounterEl) return;
-  
+
   if (wishMsgEl.value.length > 1000) {
     wishMsgEl.value = wishMsgEl.value.slice(0, 1000);
   }
-  
+
   wishCounterEl.textContent = String(wishMsgEl.value.length);
   wishMsgEl.style.height = "auto";
   wishMsgEl.style.height = Math.min(wishMsgEl.scrollHeight, 360) + "px";
@@ -617,15 +687,15 @@ async function refreshWishes() {
     const r = await fetch("https://anniv-backend-2025-1.onrender.com/wishes");
     const data = await r.json();
     const items = data.wishes || [];
-    
+
     wishesListEl.innerHTML = "";
-    
+
     const decodeEntities = (s) => {
       const d = document.createElement("div");
       d.innerHTML = s;
       return d.textContent || "";
     };
-    
+
     items.forEach((w) => {
       const row = document.createElement("div");
       row.className = "wish-item";
@@ -642,7 +712,7 @@ async function refreshWishes() {
       metaEl.className = "meta";
       const fullDecoded = decodeEntities(String(w.message || ""));
       const needsToggle = fullDecoded.length > 220;
-      
+
       const applyText = (expanded) => {
         metaEl.textContent = expanded
           ? fullDecoded
@@ -650,7 +720,7 @@ async function refreshWishes() {
           ? fullDecoded.slice(0, 220) + "…"
           : fullDecoded;
       };
-      
+
       applyText(false);
 
       content.appendChild(nameWrap);
@@ -661,13 +731,13 @@ async function refreshWishes() {
         toggleBtn.className = "icon-btn-sm read-more";
         toggleBtn.textContent = "Lire plus";
         let expanded = false;
-        
+
         EventManager.on(toggleBtn, "click", () => {
           expanded = !expanded;
           applyText(expanded);
           toggleBtn.textContent = expanded ? "Lire moins" : "Lire plus";
         });
-        
+
         content.appendChild(toggleBtn);
       }
 
@@ -676,7 +746,9 @@ async function refreshWishes() {
       const heartBtn = document.createElement("button");
       heartBtn.className = "heart-btn";
       heartBtn.setAttribute("data-id", w.id);
-      heartBtn.innerHTML = `<i class='bx bx-heart'></i> <span>${w.hearts || 0}</span>`;
+      heartBtn.innerHTML = `<i class='bx bx-heart'></i> <span>${
+        w.hearts || 0
+      }</span>`;
       actions.appendChild(heartBtn);
 
       row.appendChild(content);
@@ -689,11 +761,14 @@ async function refreshWishes() {
       EventManager.on(b, "click", async () => {
         const id = b.getAttribute("data-id");
         try {
-          const rr = await fetch("https://anniv-backend-2025-1.onrender.com/wishes/heart", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ id }),
-          });
+          const rr = await fetch(
+            "https://anniv-backend-2025-1.onrender.com/wishes/heart",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ id }),
+            }
+          );
           const dj = await rr.json();
           if (dj.hearts != null) {
             b.querySelector("span").textContent = dj.hearts;
@@ -709,18 +784,22 @@ async function refreshWishes() {
 if (wishForm) {
   EventManager.on(wishForm, "submit", async (e) => {
     e.preventDefault();
-    const n = (document.getElementById("wish-name").value || currentName || "").trim();
+    const n = (
+      document.getElementById("wish-name").value ||
+      currentName ||
+      ""
+    ).trim();
     const m = (document.getElementById("wish-message").value || "").trim();
-    
+
     if (!n || !m) return;
-    
+
     try {
       await fetch("https://anniv-backend-2025-1.onrender.com/wishes", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name: n, message: m }),
       });
-      
+
       document.getElementById("wish-message").value = "";
       refreshWishes();
       spawnConfetti(60);
@@ -754,19 +833,19 @@ function shuffle(a) {
 function setupMemory() {
   const deck = shuffle([...memIcons, ...memIcons]);
   memGrid.innerHTML = "";
-  
+
   memFirst = null;
   memLock = false;
   memMatches = 0;
   memStart = 0;
-  
+
   if (memTimer) {
     clearInterval(memTimer);
     memTimer = null;
   }
-  
+
   memTimeEl.textContent = "0.0s";
-  
+
   deck.forEach((ico, idx) => {
     const c = document.createElement("div");
     c.className = "card";
@@ -779,35 +858,40 @@ function setupMemory() {
 }
 
 function onCardClick(c) {
-  if (memLock || c.classList.contains("revealed") || c.classList.contains("matched")) {
+  if (
+    memLock ||
+    c.classList.contains("revealed") ||
+    c.classList.contains("matched")
+  ) {
     return;
   }
-  
+
   if (!memStart) {
     memStart = performance.now();
     memTimer = setInterval(() => {
-      memTimeEl.textContent = ((performance.now() - memStart) / 1000).toFixed(1) + "s";
+      memTimeEl.textContent =
+        ((performance.now() - memStart) / 1000).toFixed(1) + "s";
     }, 100);
   }
-  
+
   c.classList.add("revealed");
   c.textContent = c.dataset.icon;
-  
+
   if (!memFirst) {
     memFirst = c;
     return;
   }
-  
+
   if (memFirst.dataset.icon === c.dataset.icon) {
     memFirst.classList.add("matched");
     c.classList.add("matched");
     memMatches++;
     memFirst = null;
-    
+
     if (memMatches === memIcons.length) {
       clearInterval(memTimer);
       const elapsed = Math.round(performance.now() - memStart);
-      
+
       try {
         fetch("https://anniv-backend-2025-1.onrender.com/games/memory/best", {
           method: "POST",
@@ -818,7 +902,7 @@ function onCardClick(c) {
           }),
         });
       } catch {}
-      
+
       spawnConfetti(120);
     }
   } else {
@@ -843,9 +927,11 @@ const pollBlock = document.getElementById("poll-block");
 
 async function loadPoll() {
   try {
-    let res = await fetch("https://anniv-backend-2025-1.onrender.com/polls/cake");
+    let res = await fetch(
+      "https://anniv-backend-2025-1.onrender.com/polls/cake"
+    );
     let data = await res.json();
-    
+
     if (!data.poll || !data.poll.options) {
       await fetch("https://anniv-backend-2025-1.onrender.com/polls/cake", {
         method: "POST",
@@ -859,23 +945,23 @@ async function loadPoll() {
       res = await fetch("https://anniv-backend-2025-1.onrender.com/polls/cake");
       data = await res.json();
     }
-    
+
     const poll = data.poll || {};
     const counts = poll.counts || {};
     pollBlock.innerHTML = "";
-    
+
     const q = document.createElement("div");
     q.className = "poll-q";
     q.textContent = poll.question || "";
     pollBlock.appendChild(q);
-    
+
     const opts = poll.options || {};
     Object.keys(opts).forEach((id) => {
       const row = document.createElement("div");
       row.className = "poll-option";
       const label = opts[id].label || id;
       const cnt = counts[id] || 0;
-      
+
       row.innerHTML = `
         <span>${label}</span>
         <div>
@@ -883,7 +969,7 @@ async function loadPoll() {
           <button data-id="${id}">Voter</button>
         </div>
       `;
-      
+
       EventManager.on(row.querySelector("button"), "click", async () => {
         try {
           await fetch("https://anniv-backend-2025-1.onrender.com/polls/cake", {
@@ -898,7 +984,7 @@ async function loadPoll() {
           loadPoll();
         } catch {}
       });
-      
+
       pollBlock.appendChild(row);
     });
   } catch (error) {
@@ -1067,10 +1153,11 @@ function initQuiz(loadedQuestions) {
   userAnswers = [];
 }
 
-
 async function loadQuizQuestions() {
   try {
-    const response = await fetch("https://anniv-backend-2025-1.onrender.com/quiz/questions");
+    const response = await fetch(
+      "https://anniv-backend-2025-1.onrender.com/quiz/questions"
+    );
     const data = await response.json();
 
     const fetched = Array.isArray(data.questions) ? data.questions : [];
@@ -1105,7 +1192,12 @@ function loadDefaultQuestions() {
     {
       id: 2,
       question: "Quelle est ma série TV préférée ?",
-      options: ["Game of Thrones", "Breaking Bad", "Stranger Things", "The Office"],
+      options: [
+        "Game of Thrones",
+        "Breaking Bad",
+        "Stranger Things",
+        "The Office",
+      ],
       correctAnswer: 2,
     },
     {
@@ -1116,7 +1208,9 @@ function loadDefaultQuestions() {
     },
   ];
   allQuizQuestions = defaults;
-  quizQuestions = isAdminMode ? allQuizQuestions : sampleQuestions(allQuizQuestions, QUIZ_SAMPLE_SIZE);
+  quizQuestions = isAdminMode
+    ? allQuizQuestions
+    : sampleQuestions(allQuizQuestions, QUIZ_SAMPLE_SIZE);
 
   quizTotalQuestions.textContent = quizQuestions.length;
   updateAdminQuestionsList();
@@ -1124,7 +1218,7 @@ function loadDefaultQuestions() {
   if (quizQuestions.length > 0 && !isAdminMode) {
     showQuestion(currentQuestionIndex);
   }
-}// Afficher une question
+} // Afficher une question
 function showQuestion(index) {
   if (index >= quizQuestions.length) {
     showResults();
@@ -1221,11 +1315,17 @@ function updateQuestionsHistory() {
 
   userAnswers.forEach((answer, index) => {
     const historyItem = document.createElement("div");
-    historyItem.className = `history-item ${answer.isCorrect ? "correct" : "incorrect"}`;
+    historyItem.className = `history-item ${
+      answer.isCorrect ? "correct" : "incorrect"
+    }`;
     historyItem.innerHTML = `
       <div class="history-question">${index + 1}. ${answer.question}</div>
       <div class="history-answer">Ta réponse: ${answer.userAnswer}</div>
-      ${!answer.isCorrect ? `<div class="history-answer correct-answer">Bonne réponse: ${answer.correctAnswer}</div>` : ""}
+      ${
+        !answer.isCorrect
+          ? `<div class="history-answer correct-answer">Bonne réponse: ${answer.correctAnswer}</div>`
+          : ""
+      }
     `;
     questionsHistoryList.appendChild(historyItem);
   });
@@ -1273,18 +1373,19 @@ function restartQuiz() {
 function toggleAdminMode() {
   isAdminMode = !isAdminMode;
   quizAdminPanel.hidden = !isAdminMode;
-
-  
 }
 
 // Ajouter une nouvelle question
 async function addNewQuestion(questionData) {
   try {
-    const response = await fetch("https://anniv-backend-2025-1.onrender.com/quiz/questions", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(questionData),
-    });
+    const response = await fetch(
+      "https://anniv-backend-2025-1.onrender.com/quiz/questions",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(questionData),
+      }
+    );
 
     if (response.ok) {
       loadQuizQuestions();
@@ -1308,11 +1409,17 @@ function updateAdminQuestionsList() {
       <div class="quiz-question-content">
         <div class="quiz-question-text">${index + 1}. ${question.question}</div>
         <div class="quiz-question-options">
-          ${question.options.map((option, optIndex) => `
-            <div class="${optIndex === question.correctAnswer ? "quiz-option-correct" : ""}">
+          ${question.options
+            .map(
+              (option, optIndex) => `
+            <div class="${
+              optIndex === question.correctAnswer ? "quiz-option-correct" : ""
+            }">
               ${optionLetters[optIndex]}. ${option}
             </div>
-          `).join("")}
+          `
+            )
+            .join("")}
         </div>
       </div>
       <div class="quiz-question-actions">
@@ -1337,9 +1444,12 @@ function updateAdminQuestionsList() {
 // Supprimer une question
 async function deleteQuestion(questionId) {
   try {
-    const response = await fetch("https://anniv-backend-2025-1.onrender.com/quiz/questions/" + questionId, {
-      method: "DELETE",
-    });
+    const response = await fetch(
+      "https://anniv-backend-2025-1.onrender.com/quiz/questions/" + questionId,
+      {
+        method: "DELETE",
+      }
+    );
 
     if (response.ok) {
       loadQuizQuestions();
@@ -1353,16 +1463,23 @@ async function deleteQuestion(questionId) {
 function initQuiz() {
   // Mode Admin
 
-
   // Formulaire nouvelle question
   EventManager.on(quizQuestionForm, "submit", async (e) => {
     e.preventDefault();
 
     const question = document.getElementById("quiz-question-input").value;
-    const options = Array.from(document.querySelectorAll(".quiz-option-input")).map((input) => input.value);
-    const correctAnswer = parseInt(document.getElementById("quiz-correct-answer").value);
+    const options = Array.from(
+      document.querySelectorAll(".quiz-option-input")
+    ).map((input) => input.value);
+    const correctAnswer = parseInt(
+      document.getElementById("quiz-correct-answer").value
+    );
 
-    if (question && options.every((opt) => opt.trim()) && !isNaN(correctAnswer)) {
+    if (
+      question &&
+      options.every((opt) => opt.trim()) &&
+      !isNaN(correctAnswer)
+    ) {
       const questionData = {
         question: question,
         options: options,
@@ -1395,7 +1512,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initQuiz();
   refreshWishes();
   // Charger le meilleur score au démarrage (au cas où)
-    loadBestMemoryScore();
+  loadBestMemoryScore();
 
   // Rafraîchir périodiquement
   setInterval(refreshWishes, 10000);
