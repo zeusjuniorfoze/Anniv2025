@@ -35,7 +35,7 @@ if (window.AOS) {
   } catch {}
 }
 
-// Gestionnaire d'Ã©vÃ©nements centralisÃ©
+// Gestionnaire d'événements centralisé
 const EventManager = {
   handlers: new Map(),
 
@@ -135,7 +135,7 @@ function playPopBurst() {
       osc.stop(end);
     });
   } catch (error) {
-    console.log("Audio non supportÃ©");
+    console.log("Audio non supporté");
   }
 }
 
@@ -177,11 +177,11 @@ function playHappyBirthday() {
       t += dur + 0.02;
     });
   } catch (error) {
-    console.log("Audio non supportÃ©");
+    console.log("Audio non supporté");
   }
 }
 
-// ===== ANIMATIONS DÃ‰CORATIVES =====
+// ===== ANIMATIONS DÉCORATIVES =====
 // Ballons flottants
 function spawnBalloon() {
   if (!floatLayer) return;
@@ -203,7 +203,7 @@ function spawnBalloon() {
   setTimeout(() => b.remove(), dur * 1000);
 }
 
-// DÃ©cor de fond
+// Décor de fond
 function spawnFlyingGarland() {
   if (!bgDecor) return;
   const g = document.createElement("div");
@@ -237,7 +237,7 @@ function spawnPompon() {
   setTimeout(() => p.remove(), dur * 1000);
 }
 
-// ===== SYSTÃˆME DE NAVIGATION =====
+// ===== SYSTÈME DE NAVIGATION =====
 const lobbyEl = document.getElementById("view-lobby");
 const chatView = document.getElementById("view-chat");
 const wishesView = document.getElementById("view-wishes");
@@ -263,11 +263,11 @@ function showView(name) {
   // Cacher toutes les vues
   Object.values(views).forEach((v) => v && (v.hidden = true));
   
-  // Afficher la vue demandÃ©e
+  // Afficher la vue demandée
   if (views[name]) {
     views[name].hidden = false;
     
-    // Initialisations spÃ©cifiques aux vues
+    // Initialisations spécifiques aux vues
     if (name === "gallery") {
       loadGallery();
     } else if (name === "quiz" && !isAdminMode) {
@@ -286,7 +286,7 @@ document.querySelectorAll(".hub-card[data-view]").forEach((btn) => {
   });
 });
 
-// ===== RÃ‰CUPÃ‰RATION ET AFFICHAGE DU MEILLEUR SCORE =====
+// ===== RÉCUPÉRATION ET AFFICHAGE DU MEILLEUR SCORE =====
 async function loadBestMemoryScore() {
     try {
         const response = await fetch("https://anniv-backend-2025-1.onrender.com/games/memory/best");
@@ -335,13 +335,13 @@ function setupMemory() {
         c.className = "card";
         c.dataset.icon = ico;
         c.dataset.idx = idx;
-        c.textContent = "â“";
+        c.textContent = "❓";
         EventManager.on(c, "click", () => onCardClick(c));
         memGrid.appendChild(c);
     });
 }
 
-// Modifier la fonction onCardClick pour mettre Ã  jour le meilleur score si nÃ©cessaire
+// Modifier la fonction onCardClick pour mettre à jour le meilleur score si nécessaire
 function onCardClick(c) {
     if (memLock || c.classList.contains("revealed") || c.classList.contains("matched")) {
         return;
@@ -377,11 +377,11 @@ function onCardClick(c) {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
-                        name: currentName || "InvitÃ©",
+                        name: currentName || "Invité",
                         best_time_ms: elapsed,
                     }),
                 }).then(() => {
-                    // Recharger le meilleur score aprÃ¨s avoir sauvegardÃ©
+                    // Recharger le meilleur score après avoir sauvegardé
                     loadBestMemoryScore();
                 });
             } catch {}
@@ -392,9 +392,9 @@ function onCardClick(c) {
         memLock = true;
         setTimeout(() => {
             memFirst.classList.remove("revealed");
-            memFirst.textContent = "â“";
+            memFirst.textContent = "❓";
             c.classList.remove("revealed");
-            c.textContent = "â“";
+            c.textContent = "❓";
             memFirst = null;
             memLock = false;
         }, 700);
@@ -439,7 +439,7 @@ EventManager.on(form, "submit", async (e) => {
   const text = input.value.trim();
   if (!text) return;
 
-  // DÃ©terminer le prÃ©nom
+  // Déterminer le prénom
   if (!currentName) {
     const first = text.split(" ")[0] || "";
     currentName = first.charAt(0).toUpperCase() + first.slice(1);
@@ -447,7 +447,7 @@ EventManager.on(form, "submit", async (e) => {
 
   addMessage(text, "user");
   input.value = "";
-  statusEl.textContent = "Ã©crit...";
+  statusEl.textContent = "écrit...";
 
   try {
     const res = await fetch(apiUrl, {
@@ -469,11 +469,12 @@ EventManager.on(form, "submit", async (e) => {
     messagesEl.scrollTop = messagesEl.scrollHeight;
     statusEl.textContent = "en ligne";
   } catch (err) {
-    addMessage("Le bot est indisponible. RÃ©essaie plus tard.", "bot");
+    addMessage("Le bot est indisponible. Réessaie plus tard.", "bot");
     statusEl.textContent = "hors ligne";
   }
 });
 
+// ===== MODULE CADEAU =====
 // ===== MODULE CADEAU =====
 function openGift() {
   if (!overlay || !giftBox) return;
@@ -483,6 +484,9 @@ function openGift() {
   
   try { playPopBurst(); } catch {}
   
+  // Créer le bouton stop s'il n'existe pas
+  createMusicButton();
+  
   // Essayez de lire le morceau personnalisé si présent; sinon, fallback sur l'air synthétique
   setTimeout(() => {
     const audio = document.getElementById("gift-song");
@@ -490,7 +494,17 @@ function openGift() {
       try {
         audio.currentTime = 0;
         audio.volume = 1.0;
-        audio.play().catch(() => { try { playHappyBirthday(); } catch {} });
+        
+        // Ajouter un événement pour relancer la musique quand elle se termine
+        const handleSongEnd = () => {
+          audio.currentTime = 0;
+          audio.play().catch(() => {});
+        };
+        
+        audio.addEventListener('ended', handleSongEnd);
+        audio.play().catch(() => { 
+          try { playHappyBirthday(); } catch {} 
+        });
       } catch {
         try { playHappyBirthday(); } catch {}
       }
@@ -507,6 +521,111 @@ function openGift() {
   }, 1100);
 }
 
+// Variable globale pour suivre l'état de la musique
+let isMusicPlaying = true;
+
+// Fonction pour créer le bouton de contrôle de musique
+function createMusicButton() {
+  // Vérifier si le bouton existe déjà
+  let musicBtn = document.getElementById("music-control-btn");
+  
+  if (!musicBtn) {
+    musicBtn = document.createElement("button");
+    musicBtn.id = "music-control-btn";
+    musicBtn.innerHTML = '<i class="bx bx-pause-circle"></i> Couper le song';
+    musicBtn.className = "music-control-btn";
+    
+    // Styles pour le bouton
+    musicBtn.style.position = "fixed";
+    musicBtn.style.bottom = "20px";
+    musicBtn.style.right = "20px";
+    musicBtn.style.zIndex = "10000";
+    musicBtn.style.background = "rgba(255, 91, 138, 0.9)";
+    musicBtn.style.color = "white";
+    musicBtn.style.border = "none";
+    musicBtn.style.borderRadius = "25px";
+    musicBtn.style.padding = "12px 20px";
+    musicBtn.style.fontSize = "14px";
+    musicBtn.style.fontWeight = "bold";
+    musicBtn.style.cursor = "pointer";
+    musicBtn.style.boxShadow = "0 4px 12px rgba(0,0,0,0.3)";
+    musicBtn.style.display = "flex";
+    musicBtn.style.alignItems = "center";
+    musicBtn.style.gap = "8px";
+    musicBtn.style.transition = "all 0.3s ease";
+    
+    // Effet au survol
+    musicBtn.addEventListener("mouseenter", function() {
+      this.style.background = "rgba(255, 91, 138, 1)";
+      this.style.transform = "scale(1.05)";
+    });
+    
+    musicBtn.addEventListener("mouseleave", function() {
+      this.style.background = "rgba(255, 91, 138, 0.9)";
+      this.style.transform = "scale(1)";
+    });
+    
+    // Fonction pour toggle la musique
+    musicBtn.addEventListener("click", function() {
+      toggleMusic();
+    });
+    
+    document.body.appendChild(musicBtn);
+  }
+}
+
+// Fonction pour arrêter/relancer la musique
+function toggleMusic() {
+  const musicBtn = document.getElementById("music-control-btn");
+  const audio = document.getElementById("gift-song");
+  
+  if (isMusicPlaying) {
+    // Arrêter la musique
+    if (audio) {
+      audio.pause();
+    }
+    
+    // Arrêter l'audio synthétique (si en cours)
+    if (audioCtx) {
+      audioCtx.close().catch(() => {});
+      audioCtx = null;
+    }
+    
+    // Changer le bouton pour "Remettre le song"
+    musicBtn.innerHTML = '<i class="bx bx-play-circle"></i> Remettre le song';
+    musicBtn.style.background = "rgba(76, 175, 80, 0.9)";
+    
+    isMusicPlaying = false;
+  } else {
+    // Relancer la musique
+    if (audio) {
+      audio.play().catch(() => {
+        // Fallback sur l'audio synthétique si l'audio personnalisé échoue
+        try { playHappyBirthday(); } catch {}
+      });
+    } else {
+      // Relancer l'audio synthétique
+      try { playHappyBirthday(); } catch {}
+    }
+    
+    // Changer le bouton pour "Couper le song"
+    musicBtn.innerHTML = '<i class="bx bx-pause-circle"></i> Couper le song';
+    musicBtn.style.background = "rgba(255, 91, 138, 0.9)";
+    
+    isMusicPlaying = true;
+  }
+}
+
+// Fonction pour réinitialiser l'état de la musique (au cas où)
+function resetMusicState() {
+  isMusicPlaying = true;
+  const musicBtn = document.getElementById("music-control-btn");
+  if (musicBtn) {
+    musicBtn.innerHTML = '<i class="bx bx-pause-circle"></i> Couper le song';
+    musicBtn.style.background = "rgba(255, 91, 138, 0.9)";
+  }
+}
+
 if (overlay && openBtn) {
   EventManager.on(openBtn, "click", openGift);
   EventManager.on(overlay, "click", (e) => {
@@ -516,7 +635,7 @@ if (overlay && openBtn) {
   });
 }
 
-// ===== MODULE COMPTE Ã€ REBOURS =====
+// ===== MODULE COMPTE À REBOURS =====
 function startCountdown() {
   const nextBirthday = new Date("2025-11-03T00:00:00");
 
@@ -526,7 +645,7 @@ function startCountdown() {
 
     if (diff <= 0) {
       document.getElementById("countdown-timer").innerHTML =
-        '<span style="color: #fff; font-size: 18px;">ðŸŽ‰ Joyeux Anniversaire ! ðŸŽ‰</span>';
+        '<span style="color: #fff; font-size: 18px;">🎉 Joyeux Anniversaire ! 🎉</span>';
       spawnConfetti(100);
       return;
     }
@@ -575,7 +694,7 @@ if (copyLinkBtn) {
   EventManager.on(copyLinkBtn, "click", async () => {
     try {
       await navigator.clipboard.writeText(window.location.href);
-      alert("Lien copiÃ© dans le presse-papier !");
+      alert("Lien copié dans le presse-papier !");
       shareModal.hidden = true;
     } catch (err) {
       alert("Impossible de copier le lien");
@@ -584,7 +703,7 @@ if (copyLinkBtn) {
 }
 
 function shareEvent(platform) {
-  const text = `Joyeux anniversaire ${celebrant} ! ðŸŽ‰ Rejoins la fÃªte ici :`;
+  const text = `Joyeux anniversaire ${celebrant} ! 🎉 Rejoins la fête ici :`;
   const url = window.location.href;
 
   const shareUrls = {
@@ -599,7 +718,7 @@ function shareEvent(platform) {
   }
 }
 
-// ===== MODULE MUR DE VÅ’UX =====
+// ===== MODULE MUR DE VŒUX =====
 const wishesListEl = document.getElementById("wishes-list");
 const wishForm = document.getElementById("wish-form");
 const wishMsgEl = document.getElementById("wish-message");
@@ -647,7 +766,7 @@ async function refreshWishes() {
 
       const nameWrap = document.createElement("div");
       const nameEl = document.createElement("strong");
-      nameEl.textContent = w.name || "InvitÃ©";
+      nameEl.textContent = w.name || "Invité";
       nameWrap.appendChild(nameEl);
 
       const metaEl = document.createElement("div");
@@ -659,7 +778,7 @@ async function refreshWishes() {
         metaEl.textContent = expanded
           ? fullDecoded
           : needsToggle
-          ? fullDecoded.slice(0, 220) + "â€¦"
+          ? fullDecoded.slice(0, 220) + "…"
           : fullDecoded;
       };
       
@@ -696,7 +815,7 @@ async function refreshWishes() {
       wishesListEl.appendChild(row);
     });
 
-    // Gestion des cÅ“urs
+    // Gestion des cœurs
     wishesListEl.querySelectorAll(".heart-btn").forEach((b) => {
       EventManager.on(b, "click", async () => {
         const id = b.getAttribute("data-id");
@@ -714,7 +833,7 @@ async function refreshWishes() {
       });
     });
   } catch (error) {
-    console.error("Erreur chargement vÅ“ux:", error);
+    console.error("Erreur chargement vœux:", error);
   }
 }
 
@@ -737,7 +856,7 @@ if (wishForm) {
       refreshWishes();
       spawnConfetti(60);
     } catch (error) {
-      console.error("Erreur envoi vÅ“u:", error);
+      console.error("Erreur envoi vœu:", error);
     }
   });
 }
@@ -753,7 +872,7 @@ let memFirst = null,
   memStart = 0,
   memTimer = null;
 
-const memIcons = ["ðŸŽ‚", "ðŸŽˆ", "ðŸŽ‰", "ðŸŽ", "â­", "ðŸ°", "ðŸ¥³", "ðŸ­"];
+const memIcons = ["🎂", "🎈", "🎉", "🎁", "⭐", "🍰", "🥳", "🍭"];
 
 function shuffle(a) {
   for (let i = a.length - 1; i > 0; i--) {
@@ -784,7 +903,7 @@ function setupMemory() {
     c.className = "card";
     c.dataset.icon = ico;
     c.dataset.idx = idx;
-    c.textContent = "â“";
+    c.textContent = "❓";
     EventManager.on(c, "click", () => onCardClick(c));
     memGrid.appendChild(c);
   });
@@ -825,7 +944,7 @@ function onCardClick(c) {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            name: currentName || "InvitÃ©",
+            name: currentName || "Invité",
             best_time_ms: elapsed,
           }),
         });
@@ -837,9 +956,9 @@ function onCardClick(c) {
     memLock = true;
     setTimeout(() => {
       memFirst.classList.remove("revealed");
-      memFirst.textContent = "â“";
+      memFirst.textContent = "❓";
       c.classList.remove("revealed");
-      c.textContent = "â“";
+      c.textContent = "❓";
       memFirst = null;
       memLock = false;
     }, 700);
@@ -864,7 +983,7 @@ async function loadPoll() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           action: "create",
-          question: "Quel gÃ¢teau pour Junior ?",
+          question: "Quel gâteau pour Junior ?",
           options: ["Choco", "Vanille", "Fraise"],
         }),
       });
@@ -903,7 +1022,7 @@ async function loadPoll() {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               action: "vote",
-              name: currentName || "InvitÃ©",
+              name: currentName || "Invité",
               option_id: id,
             }),
           });
@@ -938,6 +1057,30 @@ async function fetchGallery() {
   }
 }
 
+
+const defaultPhotos = [
+  {
+    id: 1,
+    url: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=300&h=300&fit=crop",
+    caption: "Souvenir d'anniversaire",
+  },
+  {
+    id: 2,
+    url: "https://images.unsplash.com/photo-1559622214-f8a9850965bb?w=300&h=300&fit=crop",
+    caption: "Fête entre amis",
+  },
+  {
+    id: 3,
+    url: "https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=300&h=300&fit=crop",
+    caption: "Gâteau d'anniversaire",
+  },
+  {
+    id: 4,
+    url: "https://images.unsplash.com/photo-1545696563-af8f6ec2295a?w=300&h=300&fit=crop",
+    caption: "Célébration",
+  },
+];
+
 function renderGallery(photos) {
   galleryGrid.innerHTML = "";
   photos.forEach((photo) => {
@@ -958,7 +1101,6 @@ async function loadGallery() {
   const photos = await fetchGallery();
   renderGallery(photos);
 }
-
 // Gestion de l'upload
 if (uploadTrigger && photoUpload) {
   EventManager.on(uploadTrigger, "click", () => {
@@ -1039,10 +1181,45 @@ async function handleImageUpload(file) {
   reader.readAsDataURL(file);
 }
 
+// Ouvrir l'image en plein écran (lightbox)
+function openImageLightbox(src, caption = "") {
+  const overlay = document.createElement("div");
+  overlay.className = "image-lightbox";
+  overlay.innerHTML = `
+    <div class="image-lightbox-backdrop"></div>
+    <div class="image-lightbox-dialog">
+      <button class="image-lightbox-close" aria-label="Fermer">&times;</button>
+      <img src="${src}" alt="${caption || ''}">
+      ${caption ? `<div class="image-lightbox-caption">${caption}</div>` : ''}
+    </div>
+  `;
+
+  const close = () => overlay.remove();
+  overlay.querySelector('.image-lightbox-backdrop').addEventListener('click', close);
+  overlay.querySelector('.image-lightbox-close').addEventListener('click', close);
+  overlay.addEventListener('click', (e) => {
+    // Fermer si on clique en dehors du dialog
+    const dlg = overlay.querySelector('.image-lightbox-dialog');
+    if (!dlg.contains(e.target)) close();
+  });
+  const onKey = (e) => { if (e.key === 'Escape') close(); };
+  document.addEventListener('keydown', onKey, { once: true });
+  document.body.appendChild(overlay);
+}
+
+// Délégation: ouvrir au clic sur une image de la galerie
+if (galleryGrid) {
+  EventManager.on(galleryGrid, 'click', (e) => {
+    const img = e.target.closest('.gallery-item img');
+    if (!img) return;
+    const caption = img.getAttribute('alt') || '';
+    openImageLightbox(img.src, caption);
+  });
+}
+
 // ===== MODULE QUIZ INTERACTIF =====
 const quizAdminPanel = document.getElementById("quiz-admin-panel");
 const quizPlayerPanel = document.getElementById("quiz-player-panel");
-const quizAdminBtn = document.getElementById("quiz-admin-btn");
 const quizQuestionForm = document.getElementById("quiz-question-form");
 const quizQuestionsList = document.getElementById("quiz-questions-list");
 const quizCurrentQuestion = document.getElementById("quiz-current-question");
@@ -1056,21 +1233,21 @@ const quizResultMessage = document.getElementById("quiz-result-message");
 const quizRestartBtn = document.getElementById("quiz-restart-btn");
 const questionsHistoryList = document.getElementById("questions-history-list");
 
-// Mode administrateur (doit Ãªtre dÃ©clarÃ© avant usage)
+// Mode administrateur (doit être déclaré avant usage)
 let isAdminMode = false;
 
 // Constantes globales
 const QUIZ_SAMPLE_SIZE = 5;
 const optionLetters = ["A", "B", "C", "D"];
 
-// Ã‰tat du quiz
+// État du quiz
 let allQuizQuestions = []; // sera rempli depuis Firebase
 let quizQuestions = [];
 let currentQuestionIndex = 0;
 let userScore = 0;
 let userAnswers = [];
 
-// Fonction : Ã©chantillonnage alÃ©atoire de questions
+// Fonction : échantillonnage aléatoire de questions
 function sampleQuestions(list, n) {
   const arr = [...list];
   for (let i = arr.length - 1; i > 0; i--) {
@@ -1080,7 +1257,7 @@ function sampleQuestions(list, n) {
   return arr.slice(0, Math.max(0, Math.min(n, arr.length)));
 }
 
-// Exemple d'initialisation (quand Firebase aura chargÃ©)
+// Exemple d'initialisation (quand Firebase aura chargé)
 function initQuiz(loadedQuestions) {
   allQuizQuestions = loadedQuestions;
   quizQuestions = isAdminMode
@@ -1118,25 +1295,25 @@ async function loadQuizQuestions() {
     loadDefaultQuestions();
   }
 }
-// Questions par dÃ©faut
+// Questions par défaut
 function loadDefaultQuestions() {
   const defaults = [
     {
       id: 1,
-      question: "Quel est mon langage de programmation prÃ©fÃ©rÃ© ?",
+      question: "Quel est mon langage de programmation préféré ?",
       options: ["JavaScript", "Python", "Java", "PHP"],
       correctAnswer: 1,
     },
     {
       id: 2,
-      question: "Quelle est ma sÃ©rie TV prÃ©fÃ©rÃ©e ?",
+      question: "Quelle est ma série TV préférée ?",
       options: ["Game of Thrones", "Breaking Bad", "Stranger Things", "The Office"],
       correctAnswer: 2,
     },
     {
       id: 3,
-      question: "Quel est mon plat prÃ©fÃ©rÃ© ?",
-      options: ["Pizza", "Sushi", "Tacos", "PÃ¢tes Carbonara"],
+      question: "Quel est mon plat préféré ?",
+      options: ["Pizza", "Sushi", "Tacos", "Pâtes Carbonara"],
       correctAnswer: 0,
     },
   ];
@@ -1177,7 +1354,7 @@ function showQuestion(index) {
   });
 }
 
-// GÃ©rer la rÃ©ponse
+// Gérer la réponse
 function handleAnswer(selectedIndex, question) {
   const isCorrect = selectedIndex === question.correctAnswer;
 
@@ -1215,7 +1392,7 @@ function handleAnswer(selectedIndex, question) {
   }, 2000);
 }
 
-// Afficher les rÃ©sultats
+// Afficher les résultats
 function showResults() {
   quizPlayerPanel.querySelector("#quiz-current").hidden = true;
   quizResults.hidden = false;
@@ -1227,20 +1404,20 @@ function showResults() {
   let message = "";
 
   if (percentage >= 80) {
-    message = "ðŸŽ‰ Excellent ! Tu me connais parfaitement !";
+    message = "🎉 Excellent ! Tu me connais parfaitement !";
   } else if (percentage >= 60) {
-    message = "ðŸ‘ Bien jouÃ© ! Tu me connais plutÃ´t bien !";
+    message = "👍 Bien joué ! Tu me connais plutôt bien !";
   } else if (percentage >= 40) {
-    message = "ðŸ˜Š Pas mal ! On peut encore amÃ©liorer Ã§a !";
+    message = "😊 Pas mal ! On peut encore améliorer ça !";
   } else {
-    message = "ðŸ¤” On dirait qu'on a encore des choses Ã  dÃ©couvrir ensemble !";
+    message = "🤔 On dirait qu'on a encore des choses à découvrir ensemble !";
   }
 
   quizResultMessage.textContent = message;
   saveQuizScore();
 }
 
-// Mettre Ã  jour l'historique
+// Mettre à jour l'historique
 function updateQuestionsHistory() {
   questionsHistoryList.innerHTML = "";
 
@@ -1249,8 +1426,8 @@ function updateQuestionsHistory() {
     historyItem.className = `history-item ${answer.isCorrect ? "correct" : "incorrect"}`;
     historyItem.innerHTML = `
       <div class="history-question">${index + 1}. ${answer.question}</div>
-      <div class="history-answer">Ta rÃ©ponse: ${answer.userAnswer}</div>
-      ${!answer.isCorrect ? `<div class="history-answer correct-answer">Bonne rÃ©ponse: ${answer.correctAnswer}</div>` : ""}
+      <div class="history-answer">Ta réponse: ${answer.userAnswer}</div>
+      ${!answer.isCorrect ? `<div class="history-answer correct-answer">Bonne réponse: ${answer.correctAnswer}</div>` : ""}
     `;
     questionsHistoryList.appendChild(historyItem);
   });
@@ -1265,7 +1442,7 @@ async function saveQuizScore() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        name: currentName || "InvitÃ©",
+        name: currentName || "Invité",
         score: userScore,
         total: quizQuestions.length,
         answers: userAnswers,
@@ -1276,7 +1453,7 @@ async function saveQuizScore() {
   }
 }
 
-// RedÃ©marrer le quiz
+// Redémarrer le quiz
 function restartQuiz() {
   currentQuestionIndex = 0;
   userScore = 0;
@@ -1299,15 +1476,7 @@ function toggleAdminMode() {
   isAdminMode = !isAdminMode;
   quizAdminPanel.hidden = !isAdminMode;
 
-  if (isAdminMode) {
-    quizAdminBtn.innerHTML = '<i class="bx bx-user"></i>';
-    quizAdminBtn.title = "Mode Joueur";
-    loadQuizQuestions();
-  } else {
-    quizAdminBtn.innerHTML = '<i class="bx bx-cog"></i>';
-    quizAdminBtn.title = "Administrer le quiz";
-    restartQuiz();
-  }
+  
 }
 
 // Ajouter une nouvelle question
@@ -1330,7 +1499,7 @@ async function addNewQuestion(questionData) {
   return false;
 }
 
-// Mettre Ã  jour la liste des questions en mode admin
+// Mettre à jour la liste des questions en mode admin
 function updateAdminQuestionsList() {
   quizQuestionsList.innerHTML = "";
 
@@ -1385,7 +1554,7 @@ async function deleteQuestion(questionId) {
 // Initialisation du Quiz
 function initQuiz() {
   // Mode Admin
-  EventManager.on(quizAdminBtn, "click", toggleAdminMode);
+
 
   // Formulaire nouvelle question
   EventManager.on(quizQuestionForm, "submit", async (e) => {
@@ -1406,16 +1575,16 @@ function initQuiz() {
     }
   });
 
-  // RedÃ©marrage quiz
+  // Redémarrage quiz
   EventManager.on(quizRestartBtn, "click", restartQuiz);
 
   // Charger les questions
   loadQuizQuestions();
 }
 
-// ===== INITIALISATION GÃ‰NÃ‰RALE =====
+// ===== INITIALISATION GÉNÉRALE =====
 document.addEventListener("DOMContentLoaded", () => {
-  // DÃ©marrer les animations dÃ©coratives
+  // Démarrer les animations décoratives
   setInterval(spawnBalloon, 900);
   setInterval(spawnFlyingGarland, 7000);
   setInterval(spawnPompon, 1200);
@@ -1427,13 +1596,13 @@ document.addEventListener("DOMContentLoaded", () => {
   loadGallery();
   initQuiz();
   refreshWishes();
-  // Charger le meilleur score au dÃ©marrage (au cas oÃ¹)
+  // Charger le meilleur score au démarrage (au cas où)
     loadBestMemoryScore();
 
-  // RafraÃ®chir pÃ©riodiquement
+  // Rafraîchir périodiquement
   setInterval(refreshWishes, 10000);
 
-  console.log("ðŸŽ‰ Application d'anniversaire initialisÃ©e !");
+  console.log("🎉 Application d'anniversaire initialisée !");
 });
 
 // Nettoyage

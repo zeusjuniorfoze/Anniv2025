@@ -2016,6 +2016,67 @@ button:focus-visible {
     width: 100%;
   }
 }
+/* Lightbox pour images de la galerie */
+.image-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 20000;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+}
+
+.image-lightbox-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+}
+
+.image-lightbox-dialog {
+  position: relative;
+  max-width: 92vw;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 1;
+}
+
+.image-lightbox-dialog img {
+  max-width: 92vw;
+  max-height: 80vh;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+}
+
+.image-lightbox-caption {
+  margin-top: 10px;
+  color: #fff;
+  text-align: center;
+  font-size: 14px;
+}
+
+.image-lightbox-close {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.9);
+  color: #333;
+  font-size: 22px;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+.image-lightbox-close:hover {
+  background: #ffffff;
+}
+
 
 /* Liste de voeux spacing */
 .wishes-list {
